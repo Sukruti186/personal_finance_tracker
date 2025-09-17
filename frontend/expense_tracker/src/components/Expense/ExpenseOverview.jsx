@@ -11,7 +11,7 @@ const ExpenseOverview = ({ transactions, onExpenseIncome}) => {
         setChartData(result);
         return()=>{};
     },[transactions]);
-  return <div className="card">
+  return (<div className="card">
     <div className="flex items-center justify-between">
         <div className="">
             <h5 className="text-lg">Expense Overview</h5>
@@ -27,6 +27,7 @@ const ExpenseOverview = ({ transactions, onExpenseIncome}) => {
         <CustomLineChart data={chartData} />
     </div>
   </div>
+  );
 }
 
 export default ExpenseOverview

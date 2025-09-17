@@ -16,7 +16,6 @@ import { RecentIncomeWithChart } from '../../components/Dashboard/RecentIncomeWi
 import {RecentIncome} from '../../components/Dashboard/RecentIncome';
 
 
-
 const Home = () => {
   useUserAuth();
 

@@ -9,9 +9,10 @@ import Modal from '../../components/layouts/Modal';
 import AddIncomeForm from '../../components/Income/AddIncomeForm';
 import IncomList from '../../components/Income/IncomList';
 import DeleteAlert from '../../components/layouts/DeleteAlert';
-
+import { useUserAuth } from '../../hooks/useUserAuth';
 
 const Income = () => {
+  useUserAuth();
 
   const [incomeData,setIncomeData]=useState([]);
   const [loading,setLoading]=useState(false);
@@ -97,7 +98,29 @@ const Income = () => {
   };
 
   //handle download income details
-  const handleDownloadIncomeDetails=async()=>{};
+  const handleDownloadIncomeDetails=async()=>{
+    try{
+      const response = await axiosInstance.get(
+        API_PATHS.INCOME.DOWNLOAD_INCOME,
+        {
+          responseType:"blob",
+        }
+      );
+
+      //Create a url for the blob
+      const url=window.URL.createObjectURL(new Blob ([response.data]));
+      const link=document.createElement("a");
+      link.href=url;
+      link.setAttribute("download","income_details.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }catch(error){
+      console.log("Error downloding income details",error);
+      toast.error("failed to download income details. please try again ");
+    }
+  };
 
   useEffect(()=>{
     fetchIncomeDetails();
@@ -109,11 +132,13 @@ const Income = () => {
     <DashboardLayout activeMenu="Income">
       <div className='my-5 mx-auto'>
         <div className="grid grid-cols-1 gap-6">
+          <div className=''>
           <IncomOverview 
           transactions={incomeData}
           onAddIncome={()=> setOpenAddIncomeModel(true)}
           />
         </div>
+        
 
         <IncomList 
         transactions={incomeData}
@@ -122,6 +147,7 @@ const Income = () => {
         }}
         onDownload={handleDownloadIncomeDetails}
         />
+        </div>
 
         <Modal 
         isOpen={openAddIncomeModel}

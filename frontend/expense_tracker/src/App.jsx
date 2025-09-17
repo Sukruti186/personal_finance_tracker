@@ -1,60 +1,107 @@
-import React from 'react';
-import UserProvider from './context/userContext';
+// import React from 'react';
+// import UserProvider from './context/userContext';
 
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
+// import {
+//   BrowserRouter as Router,
+//   Routes,
+//   Route,
+//   Navigate,
+// } from "react-router-dom";
+
+// import Login from "./pages/Auth/Login";
+// import SignUp from "./pages/Auth/SignUp";
+// import Home from "./pages/Dashboard/Home";
+// import Income from "./pages/Dashboard/Income";
+// import Expense from "./pages/Dashboard/Expense";
+// import {Toaster} from "react-hot-toast";
+
+// const App = () => {
+//   return (
+//     <UserProvider>
+//     <div >
+//       <Router>
+//         <Routes>
+//           <Route path="/" element={<Root />} />
+//           <Route path="/login" exact element={<Login />} />
+//           <Route path="/signup" exact element={<SignUp />} />
+//           <Route path="/dashboard" exact element={<Home />} />
+//           <Route path="/income" exact element={<Income />} />
+//           <Route path="/expense" exact element={<Expense />} />
+//           {/* <Route path="/dashboard/login" element={<Login />} /> */}
+//         </Routes>
+//       </Router>
+//     </div>
+
+//     <Toaster 
+//     toastOptions={{
+//       className:"",
+//       style:{
+//         fontSize:'13px'
+//       },
+//     }}
+//     />
+//     </UserProvider>
+//   );
+// };
+
+// export default App;
+
+
+// const Root = () =>{
+//   //check if token exists in localstorage
+//   const isAuthenticated = !!localStorage.getItem("token");
+
+//   //Redirect to dashboard if authenticated,otherwise to login
+//   return isAuthenticated ? (
+//     <Navigate to="/dashboard" />
+//   ):(
+//     <Navigate to="/login" />
+//   );
+// };
+
+import React from "react";
+import UserProvider from "./context/userContext";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 
 import Login from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/SignUp";
 import Home from "./pages/Dashboard/Home";
 import Income from "./pages/Dashboard/Income";
 import Expense from "./pages/Dashboard/Expense";
-import {Toaster} from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <UserProvider>
-    <div >
-      <Router>
-        <Routes>
-          <Route path="/" element={<Root />} />
-          <Route path="/login" exact element={<Login />} />
-          <Route path="/signup" exact element={<SignUp />} />
-          <Route path="/dashboard" exact element={<Home />} />
-          <Route path="/income" exact element={<Income />} />
-          <Route path="/expense" exact element={<Expense />} />
-          {/* <Route path="/dashboard/login" element={<Login />} /> */}
-        </Routes>
-      </Router>
-    </div>
+      <div>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Root />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/dashboard" element={<Home />} />
+            <Route path="/income" element={<Income />} />
+            <Route path="/expense" element={<Expense />} />
+          </Routes>
+        </Router>
+      </div>
 
-    <Toaster 
-    toastOptions={{
-      className:"",
-      style:{
-        fontSize:'13px'
-      },
-    }}
-    />
+      <Toaster
+        toastOptions={{
+          style: { fontSize: "13px" },
+        }}
+      />
     </UserProvider>
-  )
-}
+  );
+};
 
 export default App;
 
-
-const Root = () =>{
-  //check if token exists in localstorage
+const Root = () => {
   const isAuthenticated = !!localStorage.getItem("token");
-
-  //Redirect to dashboard if authenticated,otherwise to login
   return isAuthenticated ? (
-    <Navigate to="/dashboard" />
-  ):(
-    <Navigate to="/login" />
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/login" replace />
   );
 };

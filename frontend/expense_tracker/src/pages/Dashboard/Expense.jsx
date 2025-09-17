@@ -3,6 +3,15 @@ import {useUserAuth} from "../../hooks/useUserAuth";
 import DashboardLayout from '../../components/layouts/DashboardLayout';
 import { API_PATHS } from '../../Utils/apiPaths';
 import ExpenseOverview from '../../components/Expense/ExpenseOverview';
+import toast from 'react-hot-toast';
+import 'react-toastify/dist/ReactToastify.css';
+import axiosInstance from '../../Utils/axiosInstance';
+import AddExpenseForm from '../../components/Expense/AddExpenseForm';
+import Modal from "../../components/layouts/Modal";
+import DeleteAlert from '../../components/layouts/DeleteAlert';
+import ExpenseList from '../../components/Expense/ExpenseList';
+
+
 
 const Expense = () => {
   useUserAuth();
@@ -16,7 +25,7 @@ const Expense = () => {
   
   const[openAddExpenseModel, setOpenAddExpenseModel]=useState(false);
 
-  //Get All Expense details
+   //Get All Expense details
   const fetchExpenseDetails=async()=>{
     if(loading) return;
 
@@ -74,6 +83,50 @@ const Expense = () => {
     }
   };
 
+
+    //Delete Expense details
+  const deleteExpense=async(id)=>{
+    try{
+      await axiosInstance.delete(API_PATHS.EXPENSE.DELETE_EXPENSE(id));
+
+      setOpenDeleteAlert({show:false,data:null});
+      toast.success("Expense details delete successfully");
+      fetchExpenseDetails();
+    }catch(error){
+      console.error(
+        "Error deleting expense:",
+        error.response?.data?.message || error.message
+      );
+    }
+  };
+
+  //handle download income details
+  const handleDownloadExpenseDetails=async()=>{
+    try{
+      const response = await axiosInstance.get(
+        API_PATHS.EXPENSE.DOWNLOAD_EXPENSE,
+        {
+          responseType:"blob",
+        }
+      );
+
+      //Create a url for the blob
+      const url=window.URL.createObjectURL(new Blob ([response.data]));
+      const link=document.createElement("a");
+      link.href=url;
+      link.setAttribute("download","expense_details.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }catch(error){
+      console.log("Error downloding expense details",error);
+      toast.error("failed to download expense details. please try again ");
+    }
+  };
+
+
+
   useEffect(()=>{
     fetchExpenseDetails();
 
@@ -83,19 +136,45 @@ const Expense = () => {
 
   
   return (
-     <DashboardLayout activeMenu="Income">
+     <DashboardLayout activeMenu="Expense">
       <div className='my-5 mx-auto'>
-        <div className="grid grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 gap-6">
           <div className="">
             <ExpenseOverview 
             transactions={expenseData}
             onExpenseIncome={()=> setOpenAddExpenseModel(true)}
             />
           </div>
+
+          <ExpenseList 
+        transactions={expenseData}
+        onDelete={(id)=>{
+          setOpenDeleteAlert({show:true,data:id});
+        }}
+        onDownload={handleDownloadExpenseDetails}
+        />
         </div>
+
+        <Modal isOpen={openAddExpenseModel}
+          onClose={()=>setOpenAddExpenseModel(false)}
+          title="Add Expense">
+            <AddExpenseForm onAddExpense={handleAddExpense} />
+          </Modal>
+
+          <Modal 
+        isOpen={openDeleteAlert.show}
+        onClose={()=>setOpenDeleteAlert({show:false , data:null})}
+        title="Delete Expense">
+          <DeleteAlert
+           content="Are you sure to delete this expense details "
+           onDelete={()=>deleteExpense(openDeleteAlert.data)}
+           />
+        </Modal>
+
+
       </div>
     </DashboardLayout>
-  )
-}
+  );
+};
 
-export default Expense
+export default Expense;
